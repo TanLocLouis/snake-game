@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <time.h>
+#include <vector>
 
 using namespace std;
 CONST int MAP_SIZE = 30;
@@ -77,7 +78,10 @@ public:
 
 class Snake {
 private:
-    Coordinate pos;
+    // head coor should be put on last element of pos
+    // for easy to push back
+    // rather than shift entine the array
+    vector<Coordinate> pos;
     pair<int, int> _dir;
 
     int _point;
@@ -88,25 +92,45 @@ public:
     CONST pair<int, int> RIGHT = {1, 0};
 
     Snake() {
-        pos._x = MAP_SIZE / 2;
-        pos._y = MAP_SIZE / 2;
+        pos.clear();
+        pos.push_back({MAP_SIZE / 2, MAP_SIZE / 2});
         _dir = RIGHT;
         _point = 0;
     }
 
     void show_on_xy() {
-        gotoxy(pos._x, pos._y);
-        cout << "x";      
+        for (auto p : pos) {
+            gotoxy(p._x, p._y);
+            cout << "x";      
+        }
     }
 
     void move_dir() {
-        pos._x += _dir.first;
-        pos._y += _dir.second;
+        int posSize = pos.size();
 
-        if (pos._x < 1) pos._x += MAP_SIZE;
-        if (pos._x > MAP_SIZE - 1) pos._x = 0;
-        if (pos._y < 1) pos._y += MAP_SIZE;
-        if (pos._y > MAP_SIZE - 1) pos._y = 0;
+        // only run this if snake's length > 1
+        if (posSize > 1) {
+            // shift coordinate arrays
+            for (int i = 0; i < posSize - 1; i++) {
+                pos[i] = pos[i + 1];
+            }
+            pos[posSize - 2]._x = pos[posSize - 1]._x;
+            pos[posSize - 2]._y = pos[posSize - 1]._y;
+        }
+
+        // calc new head
+        pos[posSize - 1]._x += _dir.first;
+        pos[posSize - 1]._y += _dir.second;
+        
+        // out of bound cases
+        // LEFT
+        if (pos[posSize - 1]._x < 1) pos[posSize - 1]._x += MAP_SIZE;
+        // RIGHT
+        if (pos[posSize - 1]._x > MAP_SIZE - 1) pos[posSize - 1]._x = 0;
+        // UP
+        if (pos[posSize - 1]._y < 1) pos[posSize - 1]._y += MAP_SIZE;
+        // DOWN
+        if (pos[posSize - 1]._y > MAP_SIZE - 1) pos[posSize - 1]._y = 0;
     }
 
     void set_dir(const pair<int, int>& dir) {
@@ -115,16 +139,21 @@ public:
 
     bool isHitByApple(Apple* apple) {
         pair<int, int> appleCoor = apple->getAppleCoor();
-        if (this->pos._x == appleCoor.first
-        &&  this->pos._y == appleCoor.second) {
+        if (this->pos[0]._x == appleCoor.first
+        &&  this->pos[0]._y == appleCoor.second) {
             return true;
         }
 
         return false;
     }
 
-    void increasePoint() {
+    void HitByApple(Apple* apple) {
         _point += 1;
+
+        // push new head to snake
+        // from apple position
+        auto applePos = apple->getAppleCoor();
+        pos.push_back({applePos.first, applePos.second});
     }
 
     int getPoint() {
@@ -153,7 +182,7 @@ int main() {
         apple->show_on_xy();
         
         if (louis->isHitByApple(apple)) {
-            louis->increasePoint();
+            louis->HitByApple(apple);
             apple->spawn();
         }
 
@@ -182,11 +211,5 @@ int main() {
         system("cls");
     }
 
-
-    // while (true) {
-    //     if (_kbhit) {
-    //         cout << _getch() << endl;
-    //     }
-    // }
     return 0;
 }
