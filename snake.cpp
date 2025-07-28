@@ -46,36 +46,38 @@ void drawCanvas() {
     cout << "|| SNAKE GAME ||";
 }
 
+struct Coordinate {
+    int _x;
+    int _y;
+};
 
 class Apple {
 private:
-    int _x;
-    int _y;
+    Coordinate pos;
 public:
     Apple() {
-        _x = MAP_SIZE / 3;
-        _y = MAP_SIZE / 3;
+        pos._x = MAP_SIZE / 3;
+        pos._y = MAP_SIZE / 3;
     }
 
     void spawn() {
-        _x = rand() % MAP_SIZE; 
-        _y = rand() % MAP_SIZE;
+        pos._x = rand() % MAP_SIZE; 
+        pos._y = rand() % MAP_SIZE;
     }
     
     void show_on_xy() {
-        gotoxy(_x, _y);
+        gotoxy(pos._x, pos._y);
         cout << "*";
     }
 
     pair<int, int> getAppleCoor() {
-        return {_x, _y};
+        return {pos._x, pos._y};
     }
 };
 
 class Snake {
 private:
-    int _x;
-    int _y;
+    Coordinate pos;
     pair<int, int> _dir;
 
     int _point;
@@ -86,25 +88,25 @@ public:
     CONST pair<int, int> RIGHT = {1, 0};
 
     Snake() {
-        _x = MAP_SIZE / 2;
-        _y = MAP_SIZE / 2;
+        pos._x = MAP_SIZE / 2;
+        pos._y = MAP_SIZE / 2;
         _dir = RIGHT;
         _point = 0;
     }
 
     void show_on_xy() {
-        gotoxy(_x, _y);
+        gotoxy(pos._x, pos._y);
         cout << "x";      
     }
 
     void move_dir() {
-        _x += _dir.first;
-        _y += _dir.second;
+        pos._x += _dir.first;
+        pos._y += _dir.second;
 
-        if (_x < 1) _x += MAP_SIZE;
-        if (_x > MAP_SIZE - 1) _x = 0;
-        if (_y < 1) _y += MAP_SIZE;
-        if (_y > MAP_SIZE - 1) _y = 0;
+        if (pos._x < 1) pos._x += MAP_SIZE;
+        if (pos._x > MAP_SIZE - 1) pos._x = 0;
+        if (pos._y < 1) pos._y += MAP_SIZE;
+        if (pos._y > MAP_SIZE - 1) pos._y = 0;
     }
 
     void set_dir(const pair<int, int>& dir) {
@@ -113,8 +115,8 @@ public:
 
     bool isHitByApple(Apple* apple) {
         pair<int, int> appleCoor = apple->getAppleCoor();
-        if (this->_x == appleCoor.first
-        &&  this->_y == appleCoor.second) {
+        if (this->pos._x == appleCoor.first
+        &&  this->pos._y == appleCoor.second) {
             return true;
         }
 
