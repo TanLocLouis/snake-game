@@ -50,6 +50,10 @@ void drawCanvas() {
 struct Coordinate {
     int _x;
     int _y;
+
+    bool operator==(const Coordinate& coor)  {
+        return (_x == coor._x && _y == coor._y);
+    }
 };
 
 class Apple {
@@ -71,8 +75,8 @@ public:
         cout << "*";
     }
 
-    pair<int, int> getAppleCoor() {
-        return {pos._x, pos._y};
+    Coordinate getAppleCoor() {
+        return pos; 
     }
 };
 
@@ -114,8 +118,6 @@ public:
             for (int i = 0; i < posSize - 1; i++) {
                 pos[i] = pos[i + 1];
             }
-            pos[posSize - 2]._x = pos[posSize - 1]._x;
-            pos[posSize - 2]._y = pos[posSize - 1]._y;
         }
 
         // calc new head
@@ -138,9 +140,9 @@ public:
     }
 
     bool isHitByApple(Apple* apple) {
-        pair<int, int> appleCoor = apple->getAppleCoor();
-        if (this->pos[0]._x == appleCoor.first
-        &&  this->pos[0]._y == appleCoor.second) {
+        Coordinate appleCoor = apple->getAppleCoor();
+        if (this->pos[pos.size() - 1]._x + _dir.first == appleCoor._x
+        &&  this->pos[pos.size() - 1]._y + _dir.second == appleCoor._y) {
             return true;
         }
 
@@ -153,7 +155,18 @@ public:
         // push new head to snake
         // from apple position
         auto applePos = apple->getAppleCoor();
-        pos.push_back({applePos.first, applePos.second});
+        pos.push_back({applePos._x, applePos._y});
+    }
+
+    bool isHitItsSelf() {
+        Coordinate head = pos[pos.size() - 1];
+        for (int i = 0; i < pos.size() - 1; i++) {
+            if (head == pos[i]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     int getPoint() {
@@ -173,14 +186,16 @@ int main() {
     Apple* apple = new Apple;
     char c;    
     
-    int temp = 1000;
-    while (temp--) {
+    // int temp = 1000;
+    while (true) {
         // canvas
         drawCanvas();
         showPoint(louis);
 
-        apple->show_on_xy();
-        
+        if (louis->isHitItsSelf()) {
+            break;
+        }
+
         if (louis->isHitByApple(apple)) {
             louis->HitByApple(apple);
             apple->spawn();
@@ -202,6 +217,7 @@ int main() {
             louis->set_dir(louis->RIGHT);
         }
 
+        apple->show_on_xy();
         louis->move_dir();
         louis->show_on_xy();
         // apple->spawn();
