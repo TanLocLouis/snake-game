@@ -7,7 +7,7 @@
 
 using namespace std;
 CONST int MAP_SIZE = 30;
-
+CONST int GAME_TICK = 30;
 
 // Utils
 void gotoxy(int x, int y)
@@ -139,6 +139,10 @@ public:
         _dir = dir;
     }
 
+    pair<int, int> get_dir() {
+        return _dir;
+    }
+
     bool isHitByApple(Apple* apple) {
         Coordinate appleCoor = apple->getAppleCoor();
         if (this->pos[pos.size() - 1]._x + _dir.first == appleCoor._x
@@ -205,16 +209,24 @@ int main() {
             c = getch();
         }
         if (toupper(c) == 'W') {
-            louis->set_dir(louis->UP);
+            if (louis->get_dir() != louis->DOWN) {
+                louis->set_dir(louis->UP);
+            }
         }
         if (toupper(c) == 'A') {
-            louis->set_dir(louis->LEFT);
+            if (louis->get_dir() != louis->RIGHT) {
+                louis->set_dir(louis->LEFT);
+            }
         }
         if (toupper(c) == 'S') {
-            louis->set_dir(louis->DOWN);
+            if (louis->get_dir() != louis->UP) {
+                louis->set_dir(louis->DOWN);
+            }
         }
         if (toupper(c) == 'D') {
-            louis->set_dir(louis->RIGHT);
+            if (louis->get_dir() != louis->LEFT) {
+                louis->set_dir(louis->RIGHT);
+            }
         }
 
         apple->show_on_xy();
@@ -223,7 +235,7 @@ int main() {
         // apple->spawn();
 
         // refresh screen
-        Sleep(50);
+        Sleep(1000 / GAME_TICK);
         system("cls");
     }
 
