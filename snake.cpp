@@ -47,6 +47,13 @@ void drawCanvas() {
     cout << "|| SNAKE GAME ||";
 }
 
+void showResult(int playTime, int playPoint) {
+    system("cls");
+    cout << "====================RESULT====================" << endl;
+    cout << "Time: " << playTime << " seconds" << endl;
+    cout << "Point: " << playPoint << endl;
+}
+
 struct Coordinate {
     int _x;
     int _y;
@@ -56,6 +63,8 @@ struct Coordinate {
     }
 };
 
+
+//==================================================
 class Apple {
 private:
     Coordinate pos;
@@ -89,6 +98,7 @@ private:
     pair<int, int> _dir;
 
     int _point;
+    long long _time;
 public:
     CONST pair<int, int> UP = {0, -1};
     CONST pair<int, int> DOWN = {0, 1};
@@ -99,7 +109,7 @@ public:
         pos.clear();
         pos.push_back({MAP_SIZE / 2, MAP_SIZE / 2});
         _dir = RIGHT;
-        _point = 0;
+        _point = 1;
     }
 
     void show_on_xy() {
@@ -176,6 +186,14 @@ public:
     int getPoint() {
         return _point;
     }
+
+    void setTime(long long time) {
+        _time = time;
+    }
+
+    long long getTime() {
+        return _time;
+    }
 };
 
 
@@ -188,14 +206,17 @@ int main() {
     srand(time(0));
     Snake* louis = new Snake;
     Apple* apple = new Apple;
-    char c;    
+    char c;
+
+    time_t startTime, endTime;
+    startTime = time(0);
     
-    // int temp = 1000;
+    // int temp = 100;
     while (true) {
         // canvas
         drawCanvas();
         showPoint(louis);
-
+        // if (temp == 0) break;
         if (louis->isHitItsSelf()) {
             break;
         }
@@ -239,5 +260,9 @@ int main() {
         system("cls");
     }
 
+
+    // show result
+    endTime = time(0);
+    showResult(endTime - startTime, louis->getPoint());
     return 0;
 }
